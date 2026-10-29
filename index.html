@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexus PS4</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101114;color:#f5f5f7;font-family:Arial,sans-serif}
+header{padding:22px 5%;background:#191a20;border-bottom:1px solid #30313a}
+.logo{font-size:26px;font-weight:800;letter-spacing:1px}
+.logo span{color:#69a7ff}
+.subtitle{color:#92939f;font-size:13px;margin-top:6px}
+main{padding:28px 5%}
+h1{font-size:28px;margin:0 0 8px}
+.description{color:#a4a5b0;margin-bottom:24px}
+input{width:100%;max-width:520px;background:#202128;border:1px solid #393a45;border-radius:9px;padding:14px;color:white;font-size:16px;outline:none}
+input:focus{border-color:#69a7ff}
+.filters{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0 25px}
+button{background:#252630;color:#ddd;border:1px solid #393a45;border-radius:8px;padding:10px 15px;cursor:pointer}
+button.active,button:hover{background:#315b96;border-color:#69a7ff;color:white}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:18px}
+.card{background:#1b1c22;border:1px solid #2b2c34;border-radius:12px;overflow:hidden;cursor:pointer;transition:.15s}
+.card:hover{transform:translateY(-3px);border-color:#69a7ff}
+.cover{height:205px;background:linear-gradient(145deg,#30364b,#16171d);display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;font-weight:bold;font-size:19px}
+.info{padding:13px}
+.title{font-weight:bold;margin-bottom:7px}
+.meta{font-size:12px;color:#9a9ba7}
+.status{display:inline-block;margin-top:10px;font-size:11px;color:#83c5a0}
+footer{padding:25px 5%;color:#777985;font-size:12px}
+#details{display:none;background:#1b1c22;padding:22px;border-radius:12px;margin-top:24px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">NEXUS <span>PS4</span></div>
+  <div class="subtitle">Твоя игровая библиотека</div>
+</header>
+<main>
+  <h1>Каталог игр</h1>
+  <div class="description">Находи игры, изучай информацию и создавай свою коллекцию.</div>
+  <input id="search" placeholder="Поиск по названию или жанру..." oninput="render()">
+  <div class="filters">
+    <button class="active" onclick="setFilter('Все',this)">Все игры</button>
+    <button onclick="setFilter('Экшен',this)">Экшен</button>
+    <button onclick="setFilter('RPG',this)">RPG</button>
+    <button onclick="setFilter('Хоррор',this)">Хорроры</button>
+    <button onclick="setFilter('Приключения',this)">Приключения</button>
+  </div>
+  <div id="grid" class="grid"></div>
+  <div id="details"></div>
+</main>
+<footer>NEXUS PS4 · Концепт интерфейса · База игр пока демонстрационная</footer>
+<script>
+const games=[
+ {name:"The Witcher 3",genre:"RPG",year:2015,id:"CUSA05574",desc:"Большое фэнтезийное приключение охотника на чудовищ Геральта."},
+ {name:"Cyberpunk 2077",genre:"RPG",year:2020,id:"CUSA16579",desc:"Футуристическая ролевая игра в огромном городе Найт-Сити."},
+ {name:"Resident Evil Village",genre:"Хоррор",year:2021,id:"CUSA18004",desc:"Survival horror с исследованием локаций и опасными противниками."},
+ {name:"Elden Ring",genre:"RPG",year:2022,id:"CUSA18723",desc:"Ролевая игра с исследованием мира и сложными сражениями."},
+ {name:"God of War",genre:"Экшен",year:2018,id:"CUSA07408",desc:"Приключение Кратоса и Атрея в мире скандинавской мифологии."},
+ {name:"Outer Wilds",genre:"Приключения",year:2019,id:"CUSA09929",desc:"Исследовательская игра о космосе, тайнах и времени."},
+ {name:"Assassin's Creed Unity",genre:"Экшен",year:2014,id:"CUSA00606",desc:"Приключение в Париже эпохи Французской революции."},
+ {name:"Red Dead Redemption 2",genre:"Приключения",year:2018,id:"CUSA08519",desc:"История банды Датча ван дер Линде на Диком Западе."}
+];
+let filter="Все";
+function setFilter(value,button){
+ filter=value;
+ document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
+ button.classList.add("active");
+ render();
+}
+function render(){
+ const q=document.getElementById("search").value.toLowerCase();
+ const list=games.filter(g=>(filter==="Все"||g.genre===filter)&&
+ (g.name+" "+g.genre+" "+g.id).toLowerCase().includes(q));
+ document.getElementById("grid").innerHTML=list.map(g=>`
+ <div class="card" onclick="showDetails('${g.id}')">
+ <div class="cover">${g.name}</div>
+ <div class="info"><div class="title">${g.name}</div>
+ <div class="meta">${g.genre} · ${g.year}</div>
+ <div class="status">Информация об игре</div></div></div>`).join("");
+ if(!list.length)document.getElementById("grid").innerHTML="<p>Ничего не найдено.</p>";
+}
+function showDetails(id){
+ const g=games.find(x=>x.id===id);
+ const d=document.getElementById("details");
+ d.style.display="block";
+ d.innerHTML=`<h2>${g.name}</h2><p>${g.desc}</p>
+ <p>Жанр: ${g.genre} · Год: ${g.year}</p>
+ <p>ID: ${g.id}</p>
+ <p class="meta">Демонстрационная запись. Версия, наличие PKG и совместимость ещё не проверены.</p>
+ <button onclick="document.getElementById('details').style.display='none'">Закрыть</button>`;
+ d.scrollIntoView({behavior:"smooth"});
+}
+render();
+</script>
+</body>
+</html>
