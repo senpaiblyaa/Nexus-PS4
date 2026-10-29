@@ -1,0 +1,24 @@
+name: Nexus PS4 Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify project files
+        run: |
+          echo "Nexus PS4 repository checked."
+          test -f index.html
+          echo "Web interface found."
+
+      - name: Save project files
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-ps4-source
+          path: index.html
